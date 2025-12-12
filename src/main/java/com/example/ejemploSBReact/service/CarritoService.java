@@ -1,22 +1,20 @@
 package com.example.ejemploSBReact.service;
 
-import com.example.ejemploSBReact.model.Carrito;
-import com.example.ejemploSBReact.model.CarritoItem;
-import com.example.ejemploSBReact.model.Producto;
-
-import com.example.ejemploSBReact.repository.CarritoRepository;
-import com.example.ejemploSBReact.repository.CarritoItemRepository;
-import com.example.ejemploSBReact.repository.ProductoRepository;
-
-import com.example.ejemploSBReact.dto.CarritoResponseDto;
-import com.example.ejemploSBReact.dto.CarritoItemDto;
-import com.example.ejemploSBReact.dto.AgregarItemRequestDto;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
+import com.example.ejemploSBReact.dto.AgregarItemRequestDto;
+import com.example.ejemploSBReact.dto.CarritoItemDto;
+import com.example.ejemploSBReact.dto.CarritoResponseDto;
+import com.example.ejemploSBReact.model.Carrito;
+import com.example.ejemploSBReact.model.CarritoItem;
+import com.example.ejemploSBReact.model.Producto;
+import com.example.ejemploSBReact.repository.CarritoItemRepository;
+import com.example.ejemploSBReact.repository.CarritoRepository;
+import com.example.ejemploSBReact.repository.ProductoRepository;
 
 @Service
 public class CarritoService {
@@ -124,15 +122,39 @@ public class CarritoService {
         return mapToResponse(carrito);
     }
 
+    // no descontaba stock, pero ahora sí, y eso porque antes solo confimaba que se había hecho
+    // ahora descuenta
     public CarritoResponseDto confirmarCompra(Long carritoId) {
-        Carrito carrito = carritoRepo.findById(carritoId)
-                .orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
 
-        carrito.setConfirmado(true);
-        carritoRepo.save(carrito);
+    Carrito carrito = carritoRepo.findById(carritoId)
+            .orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
 
-        return mapToResponse(carrito);
+    if (carrito.getConfirmado()) {
+        throw new RuntimeException("El carrito ya fue confirmado");
     }
+
+    // DESCUENTA STOCK
+    for (CarritoItem item : carrito.getItems()) {
+
+        Producto producto = productoRepo.findById(item.getProductoId())
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+        if (producto.getStock() < item.getCantidad()) {
+            throw new RuntimeException("Stock insuficiente para " + producto.getNombreProducto());
+        }
+
+        
+
+        producto.setStock(producto.getStock() - item.getCantidad());
+        productoRepo.save(producto);
+    }
+
+    // CONFIRMA CARRITO
+    carrito.setConfirmado(true);
+    carritoRepo.save(carrito);
+
+    return mapToResponse(carrito);
+}
 
     private CarritoResponseDto mapToResponse(Carrito carrito) {
         CarritoResponseDto dto = new CarritoResponseDto();

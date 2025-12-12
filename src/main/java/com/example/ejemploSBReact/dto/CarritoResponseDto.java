@@ -10,4 +10,3 @@ public class CarritoResponseDto {
     private List<CarritoItemDto> items;
     private Double total;
 }
-
