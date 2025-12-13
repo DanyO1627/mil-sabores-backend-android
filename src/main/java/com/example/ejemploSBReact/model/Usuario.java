@@ -20,7 +20,6 @@ public class Usuario {
     @Column(name = "email")
     private String email;
 
-    private Integer edad;
 
     // clave en BD = contraseña
     @Column(name = "clave")
@@ -28,27 +27,19 @@ public class Usuario {
 
     private String region;
     private String comuna;
-    private String estado;
-    private String rol;
-    private String categoria;
-    private String fecha;
+    
 
     public Usuario() {}
 
-    public Usuario(String nombre, String email, Integer edad, String clave,
-                   String region, String comuna, String estado, String rol,
-                   String categoria, String fecha) {
+    public Usuario(String nombre, String email, String clave,
+                   String region, String comuna
+                   ) {
 
         this.nombre = nombre;
         this.email = email;
-        this.edad = edad;
         this.clave = clave;
         this.region = region;
         this.comuna = comuna;
-        this.estado = estado;
-        this.rol = rol;
-        this.categoria = categoria;
-        this.fecha = fecha;
     }
 
     // GETTERS Y SETTERS (te los dejo completos)
@@ -61,9 +52,6 @@ public class Usuario {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
-    public Integer getEdad() { return edad; }
-    public void setEdad(Integer edad) { this.edad = edad; }
-
     public String getClave() { return clave; }
     public void setClave(String clave) { this.clave = clave; }
 
@@ -73,15 +61,4 @@ public class Usuario {
     public String getComuna() { return comuna; }
     public void setComuna(String comuna) { this.comuna = comuna; }
 
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
-
-    public String getRol() { return rol; }
-    public void setRol(String rol) { this.rol = rol; }
-
-    public String getCategoria() { return categoria; }
-    public void setCategoria(String categoria) { this.categoria = categoria; }
-
-    public String getFecha() { return fecha; }
-    public void setFecha(String fecha) { this.fecha = fecha; }
 }
